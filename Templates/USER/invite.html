@@ -1,0 +1,59 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+
+<section class="invite-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Invite Friends</h2>
+                <p>{{ invite_message }}</p>
+                <p>Sign up using the following link:</p>
+                <p><a id="signup-link" href="{{ invite_url }}">{{ invite_url }}</a></p>
+
+                <div class="share-buttons">
+                    <a href="#" onclick="shareOnWhatsApp(); return false;" class="whatsapp-button">
+                        <button class="btn btn-primary btn-lg btn-block mb-2" data-section="coupons">whatsapp</button>
+                    </a>
+                    <a href="#" onclick="shareViaEmail(); return false;" class="email-button">
+                        <button class="btn btn-primary btn-lg btn-block mb-2" data-section="coupons">Email</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+   
+
+    
+    
+
+  
+    
+
+    
+</style>
+
+<script>
+    function shareOnWhatsApp() {
+        var url = document.getElementById('signup-link').href;
+        var message = "Hey! Sign up on our website using my referral code: {{ request.user.referral_code }}. Join now!";
+        var encodedMessage = encodeURIComponent(message);
+        var whatsappLink = 'https://api.whatsapp.com/send?text=' + encodedMessage + '%0A' + encodeURIComponent(url);
+        window.open(whatsappLink, '_blank');
+    }
+
+    function shareViaEmail() {
+        var emailBody = 'Hey! Sign up on our website using my referral code: {{ request.user.referral_code }}. Join now!\n\n';
+        var subject = 'Invitation to Sign Up';
+        var url = document.getElementById('signup-link').href;
+
+        window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) +
+            '&body=' + encodeURIComponent(emailBody + url);
+    }
+</script>
+
+
+{% endblock %}

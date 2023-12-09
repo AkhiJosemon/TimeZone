@@ -1,0 +1,45 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 mt-4">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form  method="POST" action="{% url 'category:insert_sub_catogory'%}">
+                        {% csrf_token %}
+
+                        <div class="card-header">
+                            <div class="row mb-3">
+                            <div class="col-sm-6">
+                            <label for="product">Catagory</label>
+                            <select class="form-control" id="product" name="category">
+                                <option value="">Select an option</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label" >Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="sub_catagory_name" />
+                        </div>
+                        
+                        
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit">Create sub category</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+           
+            {% endblock %} 

@@ -1,0 +1,140 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+<div class="col-lg-12">
+    <form method="GET" action="{% url 'baseapp:product' %}" onsubmit="return validatePriceRange()" style="margin-left: 100px;">
+        <div class="shop-product-fillter-header row">
+            <div class="col-lg-3 mb-lg-0 mb-md-5 mb-sm-5">
+                <h5 class="mb-20 text-colorful">Categories</h5>
+                <select name="category" class="colorful-select">
+                    <option value="" {% if not selected_category %}selected{% endif %}>All</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category and selected_category.id == category.id %}selected{% endif %}>
+                            {{ category.category_name }}
+                        </option>
+                    {% endfor %}
+                    <!-- Add more categories if needed -->
+                </select>
+            </div>
+            <div class="col-lg-3 mb-lg-0 mb-md-5 mb-sm-5">
+                <h5 class="mb-20 text-colorful">Manufacturers</h5>
+                <select name="brand" class="colorful-select">
+                    <option value="" {% if not selected_brand %}selected{% endif %}>All</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if selected_brand and selected_brand.id == brand.id %}selected{% endif %}>
+                            {{ brand.brand_name }}
+                        </option>
+                    {% endfor %}
+                    <!-- Add more brands if needed -->
+                </select>
+            </div>
+            <div class="col-lg-3 mb-lg-0 mb-md-5 mb-sm-5">
+                <h5 class="mb-20 text-colorful">Price Range</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-md-2 mb-sm-2">
+                        <label for="min_price">Min Price</label>
+                        <input type="text" name="min_price" id="min_price" class="form-control price-input" placeholder="Min Price"value="{{min_price}}">
+                    </div>
+                    <div class="col-md-6 mb-md-2 mb-sm-2">
+                        <label for="max_price">Max Price</label>
+                        <input type="text" name="max_price" id="max_price" class="form-control price-input" placeholder="Max Price" value="{{max_price}}">
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                
+                
+            </div>
+            <div class="col-lg-3 mb-lg-0 mb-md-5 mb-sm-5">
+                <h5 class="mb-20 text-colorful">Sort By</h5>
+               
+                    <select name="sort_by" class="colorful-select sortFilter">
+                        <option value="highToLow" {% if selected_sort_by == 'highToLow' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="lowToHigh" {% if selected_sort_by == 'lowToHigh' %}selected{% endif %}>Price: Low to High</option>
+                        <!-- Add more sorting options if needed -->
+                    </select>
+                
+            </div>
+        
+        <button type="submit" class="btn btn-primary ">Apply Filters</button>
+    </form>
+</div>
+</div>
+
+
+<div class="popular-items section-padding30">
+    <div class="container horizontal-products">
+        <!-- Section tittle -->
+        <div class="row">
+            {% for product in products %}
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-popular-items mb-50 text-center horizontal-product">
+                    <div class="popular-img">
+                        <img src="{{ product.image.url }}" style="width:auto; height:auto;max-width:300px; max-height:300px;" alt="Product Image">
+                        <div class="img-cap">
+                            <span>Add to cart</span>
+                        </div>
+                        <div class="favorit-items">
+                            <span class="flaticon-heart"></span>
+                        </div>
+                    </div>
+                    <div class="popular-caption">
+                        <h3><a href="{% url 'baseapp:gotoproduct' product.product_id %}">{{ product.product_name }}</a></h3>
+                        <span>${{ product.price }}</span> {# Fixed 'products' to 'product' here #}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+
+            {% for product in offered_products %}
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-popular-items mb-50 text-center horizontal-product">
+                    <div class="popular-img">
+                        <img src="{{ product.image.url }}" style="width: 300px; height: 300px; object-fit: cover;" alt="Product Image">
+
+
+                        <div class="img-cap">
+                            <span>Add to cart</span>
+                        </div>
+                        <div class="favorit-items">
+                            <span class="flaticon-heart"></span>
+                        </div>
+                    </div>
+                    <div class="popular-caption">
+                        <h3><a href="{% url 'baseapp:gotoproduct' product.product_id %}">{{ product.product_name }}</a></h3>
+                        <h6>Real price</h6><span>${{ product.dis_price }}</span> 
+                        <h6>Offer price</h6><span>${{ product.checkprice }}</span>{# Fixed 'products' to 'product' here #}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // Ensure minimum is less than maximum
+    function validatePriceRange() {
+        var minPrice = document.getElementById('min_price').value;
+        var maxPrice = document.getElementById('max_price').value;
+        if(!minPrice && !maxprice){
+            return true
+        }
+        if (minPrice >= maxPrice || isNaN(minPrice) || isNaN(maxPrice)) {
+            alert('Please select vaid filter details');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock  %}
+
+

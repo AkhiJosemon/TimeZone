@@ -1,0 +1,143 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <div class="dashboard">
+    
+
+
+
+
+    <h2>Welcome to the Admin Dashboard</h2>
+
+    <div class="metric-card total-orders">
+      <h3>Total Orders</h3>
+      <p>{{ total_orders }}</p>
+    </div>
+
+    <div class="metric-card total-revenue">
+      <h3>Total Revenue</h3>
+      <p>${{ total_revenue }}</p>
+    </div>
+
+    <div class="recent-orders">
+      <h3>Recent Orders</h3>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Order Number</th>
+            <th>Total Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+            <tr>
+              <td>{{ order.order_number }}</td>
+              <td>${{ order.order_total }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div><br><br><br>
+  <div class="metric-card total-chart">
+    <h3>Total Orders and Revenue</h3>
+    <canvas id="totalChart" width="400" height="200"></canvas>
+ </div>
+ 
+
+  <style>
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .metric-card {
+      border: 1px solid #3498db;
+      padding: 20px;
+      text-align: center;
+      width: 200px;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    .total-orders {
+      background-color: #e74c3c;
+      border-color: #e74c3c;
+    }
+
+    .total-revenue {
+      background-color: #2ecc71;
+      border-color: #2ecc71;
+    }
+
+    .recent-orders {
+      flex-grow: 1;
+    }
+
+    .order-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .order-table th,
+    .order-table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .order-table th {
+      background-color: #f2f2f2;
+    }
+    .total-chart {
+      border: 1px solid #3498db;
+      padding: 20px;
+      text-align: center;
+      width: 400px;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: #fff;
+    }
+    
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var totalOrders = {{ total_orders }};
+      var totalRevenue = {{ total_revenue }};
+  
+      var ctx = document.getElementById('totalChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Total Orders', 'Total Revenue'],
+          datasets: [{
+            label: 'Count',
+            data: [totalOrders, totalRevenue],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)', // Total Orders
+              'rgba(75, 192, 192, 0.7)'  // Total Revenue
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+  </script>
+  
+{% endblock %}

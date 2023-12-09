@@ -1,0 +1,61 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+
+
+
+
+
+{% block content %}
+<div class="col-lg-12 d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <h5 class="card-title fw-semibold mb-4">Coupons</h5>
+           
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{% url 'category:add_coupons' %}" class="btn btn-primary">Add Coupons</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table text-nowrap mb-0 align-middle">
+                    <thead class="text-dark fs-4">
+                        <tr>
+
+                           
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Coupon Name</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Coupon Amount</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Coupon Expiry</h6>
+                            </th>
+                            <th class="border-bottom-0">
+                                <h6 class="fw-semibold mb-0">Action</h6>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for coupon in coupons %}
+                        <tr>
+                          
+                            <td>{{coupon.coupon_name}}</td>
+                            <td>{{coupon.coupon_amount}}</td>
+                            <td>{{coupon.expiry_date}}</td>
+                            
+                            <td>
+                                 <a href="{% url 'category:edit_coupon' coup_id=coupon.id %}" class="btn btn-sm btn-primary">Edit</a> 
+                                <form method="post" action="{% url 'category:delete_coupon' coup_id=coupon.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                                </form>
+                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

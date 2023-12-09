@@ -1,0 +1,223 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block title %}Add Product{% endblock title %}
+{% block content %}
+
+<div class="slider-area">
+    <div class="hero-cap text-center">
+        <h2>Checkout</h2>
+    </div>
+</div>
+
+<!--================ Checkout Area =================-->
+<section class="checkout_area section_padding">
+    <div class="container">
+        <div class="billing_details">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3>Shipping Address</h3>
+                    <table class="table">
+                        {% for address in addresses %}
+                            <tr>
+                                <td class="address-item" style="border: {% if address.is_default %}5px solid skyblue;{% else %}1px solid #ccc;{% endif %} padding: 10px;">
+                                    {{ address.label }}<br>
+                                    {{ address.street }}<br>
+                                    {{ address.city }}, {{ address.state }}, {{ address.postal_code }}<br>
+                                    {{ address.country }}<br>
+                                    {{ address.phone_number }}<br>
+                                    {% if not address.is_default %}
+                                        <br>
+                                        <a href="{% url 'cart:setdefaultaddress' address.id %}">
+                                            <button class="btn btn-primary" style="padding: 10px; font-size: 12px;">
+                                                Select Address
+                                            </button>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% if not addresses  %}
+                    <p style="color: red;">Add an address to proceed with the order.</p>
+                    <a href="{% url 'baseapp:addaddress' %}" class="btn btn-primary">Add Address</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <div class="order_box">
+            <h2>Your Order</h2>
+            <ul class="list">
+                {% for product in cart_items %}
+                    <li>
+                        <a href="#">{{ product.product.product_name }}
+                            <span class="middle">x {{ product.quantity }}</span>
+                            <span class="last">$</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="list list_2">
+                <li>
+                    <a href="#">Subtotal
+                        <span>${{ total }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">Shipping
+                        <span>Flat Rate: $5.00</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="list list_2">
+                <li>
+                    <a href="#">Total
+                        <span>${{ grand_total }}</span>
+                    </a>
+                </li>
+            </ul>
+            {% if list_coupon %}
+                <form method="get" id="applyCouponForm" action="{% url 'cart:apply_coupon' %}">
+                    <div class="form-group">
+                        <select class="form-control" name="coupon_code" id="couponCode">
+                            <!-- Populate this dropdown with available coupons from your database -->
+                            {% for coupon in list_coupon %}
+                                <option value="{{ coupon.id }}">{{ coupon.coupon_name }}</option>
+                            {% endfor %}
+                            <!-- Add more options as needed -->
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="applyCoupon()">Apply</button>
+                    </div>
+                </form>
+                {% endif %}
+
+            <br>
+            <br>
+            <br>
+            <br>
+
+        </div>
+        <div class="order_details">
+            <form method="post" action="{% url 'order:place_order'%}">
+                {% csrf_token %}
+                <input type="hidden" name="cart_id" value="{{ cart_items }}">
+                <input type="hidden" name="grand_total" value="{{ grand_total }}">
+                <input type="hidden" name="total" value="{{ total }}">
+                <input type="hidden" name="tax" value="{{ tax }}">
+                <br>
+                {% if addresses %}
+                <button type="submit" class="btn btn-primary">Cash on delivery</button>
+                <a href="{% url 'order:pay_with_wallet' g_total=grand_total  %}" class="btn btn-primary mb-2" style="color: white;">Pay with Wallet</a>
+                <a id="rzp-button1" class="btn btn-primary mb-2" style="color: white;">Pay with Razorpay</a>
+            {% endif %}
+            </form>
+            {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+        </div>
+    </div>
+</section>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+        "key": "rzp_test_MNgq8bKpVCEciB",
+        "amount": parseFloat("{{ grand_total }}") * 100,
+        "currency": "INR",
+        "name": "Time_zone",
+        "description": "Purchase",
+        "image": "https://example.com/your_logo",
+        "theme": {
+            "color": "#3399cc"
+        },
+        "handler": function (response) {
+            // Get the CSRF token
+            var csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+            // Create a hidden form
+            var form = document.createElement("form");
+            form.setAttribute("method", "post");
+            form.setAttribute("action", "{% url 'order:confirm_razorpay_payment' %}");
+
+            // Create hidden input fields
+            var csrfInput = document.createElement("input");
+            csrfInput.setAttribute("type", "hidden");
+            csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+            csrfInput.setAttribute("value", csrfToken);
+            form.appendChild(csrfInput);
+
+            var cartIdInput = document.createElement("input");
+            cartIdInput.setAttribute("type", "hidden");
+            cartIdInput.setAttribute("name", "cart_id");
+            cartIdInput.setAttribute("value", "{{ cart_items }}");
+            form.appendChild(cartIdInput);
+
+            var grandTotalInput = document.createElement("input");
+            grandTotalInput.setAttribute("type", "hidden");
+            grandTotalInput.setAttribute("name", "grand_total");
+            grandTotalInput.setAttribute("value", "{{ grand_total }}");
+            form.appendChild(grandTotalInput);
+
+            var totalInput = document.createElement("input");
+            totalInput.setAttribute("type", "hidden");
+            totalInput.setAttribute("name", "total");
+            totalInput.setAttribute("value", "{{ total }}");
+            form.appendChild(totalInput);
+
+            var taxInput = document.createElement("input");
+            taxInput.setAttribute("type", "hidden");
+            taxInput.setAttribute("name", "tax");
+            taxInput.setAttribute("value", "{{ tax }}");
+            form.appendChild(taxInput);
+
+            // Append the form to the body
+            document.body.appendChild(form);
+
+            // Submit the form
+            form.submit();
+
+            alert("Payment successful!");
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    rzp1.on('payment.failed', function (response) {
+        alert('Payment Failed');
+        
+    });
+
+    document.getElementById('rzp-button1').addEventListener('click', function (e) {
+        rzp1.open();
+        e.preventDefault();
+    });
+
+
+    function applyCoupon() {
+        // Get the selected coupon ID
+        var selectedCouponId = document.getElementById('couponCode').value;
+
+        // Construct the URL with the selected coupon ID
+        var url = "{% url 'cart:apply_coupon' %}?coupon_code=" + selectedCouponId;
+
+        // Redirect to the URL
+        window.location.href = url;
+    }
+
+
+    
+
+
+
+    
+</script>
+            {% comment %} var orderNumber = "{{ order.order_number }}"; // Get the order number {% endcomment %}
+
+{% endblock %}

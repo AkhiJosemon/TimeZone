@@ -1,0 +1,69 @@
+{% extends 'admin/inheritance.html' %}
+
+{% block content %}
+<div>
+<form method="post" enctype="multipart/form-data" action="{% url 'category:edit_variant' var_id=variant.id %}" style="max-width: 400px; margin: 0 auto;">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.color.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Color:</label>
+        {{ form.color }}
+        {{ form.color.errors }}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.body_type.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Body Type:</label>
+        {{ form.body_type }}
+        {{ form.body_type.errors }}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.strap_type.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Strap Type:</label>
+        {{ form.strap_type }}
+        {{ form.strap_type.errors }}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.stocks.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Stocks:</label>
+        {{ form.stocks }}
+        {{ form.stocks.errors }}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.product.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Product:</label>
+        {{ form.product }}
+        {{ form.product.errors }}
+    </div>
+
+    <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Edit Variant</button>
+
+</form>
+
+</div>
+Linnaeus was the son of a curate[5] and he was born in Råshult, the countryside of Småland, in southern Sweden. He received most of his higher education at Uppsala University and began giving lectures in botany there in 1730. He lived abroad between 1735 and 1738, where he studied and also published the first edition of his Systema Naturae in the Netherlands. He then returned to Sweden where he became professor of medicine and botany at Uppsala. In the 1740s, he was sent on several journeys through Sweden to find and classify plants and animals. In the 1750s and 1760s, he continued to collect and classify animals, plants, and minerals, while publishing several volumes. By the time of his death in 1778, he was one of the most acclaimed scientists in Europe.
+
+Philosopher Jean-Jacques Rousseau sent him the message: "Tell him I know no greater man on Earth."[6] Johann Wolfgang von Goethe wrote: "With the exception of Shakespeare and Spinoza, I know no one among the no longer living who has influenced me more strongly."[6] Swedish author August Strindberg wrote: "Linnaeus was in reality a poet who happened to become a naturalist."[7] Linnaeus has been called Princeps botanicorum (Prince of Botanists) and "The Pliny of the North".[8] He is also considered one of the founders of modern ecology.[9]
+
+In botany and zoology, the abbreviation L. is used to indicate Linnaeus as the authority for a species' name.[10] In older publications, the abbreviation "Linn." is found. Linnaeus's remains constitute the type specimen for the species Homo sapiens following the International Code of Zoological Nomenclature, since the sole specimen that he is known to have examined was himself.[note 2]
+
+Early life
+Childhood
+See also: Linné family
+
+Birthplace at Råshult
+Linnaeus was born in the village of Råshult in Småland, Sweden, on 23 May 1707. He was the first child of Nicolaus (Nils) Ingemarsson (who later adopted the family name Linnaeus) and Christina Brodersonia. His siblings were Anna Maria Linnæa, Sofia Juliana Linnæa, Samuel Linnæus (who would eventually succeed their father as rector of Stenbrohult and write a manual on beekeeping),[11][12][13] and Emerentia Linnæa.[14] His father taught him Latin as a small child.[15]
+
+One of a long line of peasants and priests, Nils was an amateur botanist, a Lutheran minister, and the curate of the small village of Stenbrohult in Småland. Christina was the daughter of the rector of Stenbrohult, Samuel Brodersonius.[16]
+
+A year after Linnaeus's birth, his grandfather Samuel Brodersonius died, and his father Nils became the rector of Stenbrohult. The family moved into the rectory from the curate's house.[17][18]
+
+Even in his early years, Linnaeus seemed to have a liking for plants, flowers in particular. Whenever he was upset, he was given a flower, which immediately calmed him. Nils spent much time in his garden and often showed flowers to Linnaeus and told him their names. Soon Linnaeus was given his own patch of earth where he could grow plants.[19]
+
+Carl's father was the first in his ancestry to adopt a permanent surname. Before that, ancestors had used the patronymic naming system of Scandinavian countries: his father was named Ingemarsson after his father Ingemar Bengtsson. When Nils was admitted to the University of Lund, he had to take on a family name. He adopted the Latinate name Linnæus after a giant linden tree (or lime tree), lind in Swedish, that grew on the family homestead.[11] This name was spelled with the æ ligature. When Carl was born, he was named Carl Linnæus, with his father's family name. The son also always spelled it with the æ ligature, both in handwritten documents and in publications.[17] Carl's patronymic would have been Nilsson, as in Carl Nilsson Linnæus.[20]
+
+Early education
+
+
+{% endblock %}

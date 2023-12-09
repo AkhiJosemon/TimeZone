@@ -1,0 +1,258 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+
+{% block title %}Add Product{% endblock title %}
+{% block content %}
+<style>
+    .variant-label {
+        margin-bottom: 10px; /* Adjust the margin as needed */
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title" style="margin-top: 70px;">Add Product</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" action="{% url 'category:add_product' %}">
+                        {% csrf_token %}
+                        {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                        </div>
+                        {% endfor %}
+                        <div class="row mb-3">
+                           
+                            <div class="col-sm-6">
+                                <label for="{{ form.name.id_for_label }}">Product Name</label>
+                                <input type="text" class="form-control" id="product_name" name="product_name">
+                            </div>
+                        </div>
+
+                        <div class="card-header">
+                            <div class="row mb-3">
+                            <div class="col-sm-6">
+                            <label for="product">Catagory</label>
+                            <select class="form-control" id="categoryDropdown" name="category">
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                        <div class="card-header">
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                            
+                            <label for="{{ form.description.id_for_label }}">Description</label>
+                            <textarea name="description" class="form-control" rows="4"></textarea>
+                        
+                    </div>
+                </div>
+            </div>     
+            
+            <div class="card-header">
+                <div class="row mb-3">
+                <div class="col-sm-6">
+                <label for="product">Sub Catagory</label>
+                <select class="form-control subcategory-dropdown" id="subcategoryDropdown" name="sub_category">
+                    <option value="">Select a subcategory</option>
+                    {% for subcategory in sub_categories %}
+                        <option value="{{ subcategory.id }}" data-category="{{ subcategory.category_id }}">{{ subcategory.subcategory_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+                    <div class="card-header">
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                        
+                                <label for="{{ form.price.id_for_label }}">Price</label>
+                                <input type="text" class="form-control" id="price" name="price">
+                                {% if form.errors.price %}
+                                <p class="text-danger">{{ form.errors.price.0 }}</p>
+                                {% endif %}
+                            
+                            </div>
+                        </div>
+                    </div>        
+                            <div class="card-header">
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                
+                                {% comment %} <label for="{{ form.stocks.id_for_label }}">stock</label>
+                                <input type="text" class="form-control" id="{{ form.stocks.id_for_label }}" name="stock" value="{{ product.stocks }}">
+                                {% if form.errors.stocks %}
+                                <p class="text-danger">{{ form.errors.stocks.0 }}</p>
+                                {% endif %} {% endcomment %}
+                            
+                            
+                            </div>
+                        </div>
+                    </div>    
+                            <div class="card-header">
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                
+                                <label for="{{ form.brand.id_for_label }}">Brand</label>
+                                <select class="form-control" id="{{ form.brand.id_for_label }}" name="brand">
+                                    <option value="">Select an option</option>
+                                    {% for brand in brands %}
+                                        <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                            {% comment %} <div class="card-header">
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                
+                                <label for="{{ form.variant.id_for_label }}">Variant</label>
+                                <select class="form-control"  id="{{ form.variant.id_for_label }}" name="variant">
+                                    <option value="">Select an option</option>
+                                    {% for variant in variants %}
+                                        
+                                        <option value="{{ variant.id }}">{{ variant.variant_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div> {% endcomment %}
+                    {% comment %} </div>                    {% endcomment %}
+
+                        <div class="card-header">
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                            
+                                    <label for="{{ form.image.id_for_label }}">Image</label>
+                                    <input type="file" class="form-control" id="id_images" name="images[]" accept="image/*" multiple>
+                                    <div id="image-preview" class="mt-3"></div>
+                                    <button type="button" id="crop-button" class="btn btn-primary mt-3" style="display: none;">Crop Image</button>
+                                    <input type="hidden" id="cropped-images" name="cropped_images" value="">
+                                    
+                                  
+                    </div>
+                </div>
+                        
+                        <div class="text-center"> <!-- Center the form -->
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="#" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.js"></script>
+<script>
+    // Function to initialize the Cropper.js instance for image cropping
+    function initImageCropper() {
+        const imageInput = document.getElementById('id_images');
+        const imagePreview = document.getElementById('image-preview');
+        const cropButton = document.getElementById('crop-button');
+        const croppedImagesInput = document.getElementById('cropped-images');
+    
+        imageInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+    
+            if (!files || files.length === 0) return;
+    
+            // Clear previous previews
+            imagePreview.innerHTML = '';
+    
+            Array.from(files).forEach((file, index) => {
+                const reader = new FileReader();
+    
+                reader.onload = function () {
+                    const img = new Image();
+                    img.src = reader.result;
+    
+                    img.onload = function () {
+                        // Create a container for each image
+                        const imageContainer = document.createElement('div');
+                        imageContainer.classList.add('image-container');
+    
+                        // Append the image to the container
+                        imageContainer.appendChild(img);
+    
+                        // Append the container to the preview area
+                        imagePreview.appendChild(imageContainer);
+    
+                        // Initialize Cropper.js for each image
+                        const cropper = new Cropper(img, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            guides: true,
+                            background: false,
+                            autoCropArea: 0.8,
+                            responsive: true,
+                        });
+    
+                        // Attach event listener to crop button for each image
+                        cropButton.addEventListener('click', function () {
+                            const croppedCanvas = cropper.getCroppedCanvas();
+                            croppedCanvas.toBlob(function (blob) {
+                                // Create a new image element to preview the cropped image
+                                const croppedImg = new Image();
+                                croppedImg.src = URL.createObjectURL(blob);
+    
+                                // Set the size of the preview image
+                                croppedImg.style.width = '100%';
+    
+                                // Clear previous previews and append the new one
+                                imageContainer.innerHTML = '';
+                                imageContainer.appendChild(croppedImg);
+    
+                                // Update the hidden field with the cropped image data
+                                const croppedImages = JSON.parse(croppedImagesInput.value || '[]');
+                                croppedImages[index] = blob;
+                                croppedImagesInput.value = JSON.stringify(croppedImages);
+                            });
+                        });
+                    };
+                };
+    
+                reader.readAsDataURL(file);
+            });
+    
+            // Show the crop button after images loaded
+            cropButton.style.display = 'block';
+        });
+    }
+    
+    // Call the function to initialize the image cropper
+    initImageCropper();
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get references to the category and subcategory dropdowns
+        const categoryDropdown = document.getElementById('categoryDropdown');
+        const subcategoryDropdown = document.getElementById('subcategoryDropdown');
+
+        // Add an event listener to the category dropdown
+        categoryDropdown.addEventListener('change', function () {
+            // Get the selected category value
+            const selectedCategoryId = categoryDropdown.value;
+
+            // Filter subcategories based on the selected category
+            const subcategories = document.querySelectorAll('.subcategory-dropdown option');
+            subcategories.forEach(function (subcategory) {
+                // Hide or show subcategories based on the selected category
+                subcategory.style.display = (subcategory.getAttribute('data-category') === selectedCategoryId || selectedCategoryId === '') ? 'block' : 'none';
+            });
+        });
+    });
+    
+</script>
+
+{% endblock %}

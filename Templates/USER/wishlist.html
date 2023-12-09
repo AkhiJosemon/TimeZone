@@ -1,0 +1,63 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block content %}
+    {% csrf_token %}
+    <h2>My Wishlist</h2>
+    {% if wishlist_items %}
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 5px;
+        }
+    </style>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Image</th>
+                <th>Action</th>
+                <th>Remove</th>
+                <!-- Add more headings as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in wishlist_items %}
+                <tr>
+                    <td>{{ item.product.product_name }}</td>
+                    <td><img src="{{ item.product.image.url }}" alt="{{ item.product.product_name }}"></td>
+                    <td><a href="{% url 'cart:addtocart' item.product_id  %}" class="btn_3">add to cart</a></td>
+                    <td><a href="{% url 'baseapp:remove_wishlist' item_id=item.id  %}" class="btn_3">Remove</a></td>
+                    <!-- Add more details as needed -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Your wishlist is empty.</p>
+{% endif %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    
+    
+    
+    
+ 
+{% endblock %}

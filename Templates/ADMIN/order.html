@@ -1,0 +1,72 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="col-lg-12 d-flex align-items-stretch">
+    <div class="card w-100">
+      <div class="card-body p-4">
+        
+          
+  
+        <div class="table-responsive">
+          <table class="table text-nowrap mb-0 align-middle">
+              <thead class="text-dark fs-4">
+                  <tr>
+                      
+                      <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Order Number</h6>
+                      </th>
+                      <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Order Date</h6>
+                      </th>
+                      
+                        
+                      <th class="border-bottom-0">
+                        <h6 class="fw-semibold mb-0">Order Status</h6>
+                    </th>
+
+
+                      <th class="border-bottom-0">
+                          <h6 class="fw-semibold mb-0">Action</h6>
+                      </th>
+                      
+                  </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                  <tr>
+                      <td>{{ order.order_number }}</td>
+                      <td>{{ order.created_at }}</td>
+                      <td>{{ order.status }}</td>
+                      <td>
+                      <form action="{% url 'category:update_order_status' order_id=order.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group" >
+                            <label for="status">Order Status</label>
+                            <select class="form-control" id="status" name="status">
+                                {% for status_value, status_label in order.STATUS %}
+                                    <option value="{{ status_value }}" {% if order.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Apply</button>
+                    </form>
+                </td> {# Use product.category.category_name to access the category name #}
+                      <!-- <td>{{ product.description }}</td> -->
+                  </tr>
+                
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+{% endblock %}

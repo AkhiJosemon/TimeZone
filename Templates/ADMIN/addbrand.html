@@ -1,0 +1,29 @@
+{% extends 'admin/inheritance.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 mt-4">
+            <div class="card">
+                <div class="card-body p-4">
+                    <form  method="POST" action="{% url 'category:add_brand'%}">
+
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label" >Brand Name</label>
+                            <input type="text" placeholder="Type here" class="form-control" name="Brand_name" />
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary" type="submit">Create Brand</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+           
+            {% endblock %}

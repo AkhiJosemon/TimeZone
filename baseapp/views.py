@@ -19,7 +19,7 @@ from django.contrib import auth
 
 @never_cache
 def index(request):
-    return render(request,'USER/index.html')
+    return render(request,'user/index.html')
     
 
 @never_cache
@@ -52,7 +52,7 @@ def handlelogin(request):
             messages.success(request, "Login successful!")
             return redirect('baseapp:index')
             
-    return render(request,'USER/login.html')
+    return render(request,'user/login.html')
 
 
 @never_cache
@@ -102,7 +102,7 @@ def signup(request):
         request.session['email'] = email
         return redirect('baseapp:sp')
 
-    return render(request, "USER/signup.html")
+    return render(request, "user/signup.html")
 
 @never_cache
 def sent_otp(request):
@@ -217,7 +217,7 @@ def products(request):
             'categories': categories,
             'brands': brands,
         }
-        return render(request, 'USER/--', context)
+        return render(request, 'user/--', context)
 
 @never_cache
 def gotoproduct(request,product_id):
@@ -233,7 +233,7 @@ def gotoproduct(request,product_id):
         'related_products': related_products
      }
 
-    return render(request, 'USER/page.html', context)
+    return render(request, 'user/page.html', context)
 
 @never_cache
 def user_logout(request):
@@ -265,7 +265,7 @@ def admin_login(request):
                 print("hello")
                 return redirect('baseapp:base')  # Use the named URL pattern
             messages.error(request, "Invalid admin credentials!")
-    return render(request, 'ADMIN/login.html')
+    return render(request, 'admin/login.html')
 
 @never_cache
 def admin_logout(request):
@@ -503,7 +503,7 @@ def invite(request):
         'invite_url': request.build_absolute_uri(reverse('baseapp:signup')),
     }
 
-    return render(request, 'USER/invite.html', context)
+    return render(request, 'user/invite.html', context)
 
 def remove_wishlist(request,item_id):
     var=Wishlist.objects.get(pk=item_id)

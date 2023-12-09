@@ -403,7 +403,7 @@ def Order_list(request):
         
     }
     
-    return render(request,'ADMIN/order.html',context)
+    return render(request,'admin/order.html',context)
 
 @login_required(login_url='baseapp:admin_pannel')
 def update_order_status(request,order_id):
@@ -440,7 +440,7 @@ def edit_variant(request,var_id):
         'form': form,
         'variant': variant,
     }
-    return render(request, 'ADMIN/editvarients.html', context)
+    return render(request, 'admin/editvarients.html', context)
 
 
 def delete_variant(request,var_id):
@@ -455,7 +455,7 @@ def coupons_list(request):
     context = {
         'coupons': coupons
     }
-    return render(request, 'ADMIN/couponslist.html', context)
+    return render(request, 'admin/couponslist.html', context)
 
 @login_required(login_url='baseapp:admin_pannel')
 def add_coupons(request):
@@ -467,7 +467,7 @@ def add_coupons(request):
     else:
         form = CouponForm()
 
-    return render(request, 'ADMIN/addcoupons.html', {'form': form})
+    return render(request, 'admin/addcoupons.html', {'form': form})
 
 def delete_coupon(request,coup_id):
     if request.method=='POST':
@@ -491,7 +491,7 @@ def edit_coupon(request,coup_id):
         'form': form,
         'coupon':coupon,
     }
-    return render(request, 'ADMIN/editcoupons.html', context)
+    return render(request, 'admin/editcoupons.html', context)
 
 
 def add_product_offer(request, product_id):
@@ -506,7 +506,7 @@ def add_product_offer(request, product_id):
     else:
         form = ProductOfferForm()
 
-    return render(request, 'Admin/add_product_offer.html', {'form': form, 'product': product})
+    return render(request, 'admin/add_product_offer.html', {'form': form, 'product': product})
 
 @login_required(login_url='baseapp:admin_pannel')
 def add_category_offer(request, category_id):
@@ -521,7 +521,7 @@ def add_category_offer(request, category_id):
     else:
         form = CategoryOfferForm()
 
-    return render(request, 'ADMIN/add_category_offer.html', {'form': form, 'category': category})
+    return render(request, 'admin/add_category_offer.html', {'form': form, 'category': category})
 
 @login_required(login_url='baseapp:admin_pannel')
 def productofferpage(request):
@@ -529,7 +529,7 @@ def productofferpage(request):
     context={
         'products' : product
     }
-    return render(request,'ADMIN/select_product.html',context)
+    return render(request,'admin/select_product.html',context)
 
 @login_required(login_url='baseapp:admin_pannel')
 def categoryofferpage(request):
@@ -537,7 +537,7 @@ def categoryofferpage(request):
     context={
         'category' : category
     }
-    return render(request,'ADMIN/select_category.html',context)
+    return render(request,'admin/select_category.html',context)
 
 @login_required(login_url='baseapp:admin_pannel')
 def productofferlist(request):
@@ -545,7 +545,7 @@ def productofferlist(request):
     context={
         'offer' : offer
     }
-    return render(request,'ADMIN/productofferlist.html',context)
+    return render(request,'admin/productofferlist.html',context)
 
 
 def categoryofferlist(request):

@@ -83,9 +83,15 @@ AUTH_USER_MODEL='baseapp.Account'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME':config('NAME'),
+         'USER': config('USER'),
+        'PASSWORD': config('PASSWORD'),
+        'HOST': config('HOST'),  # Leave it as 'localhost' if your database is on the same machine
+        'PORT': '', 
     }
 }
+
+
 
 
 # Password validation

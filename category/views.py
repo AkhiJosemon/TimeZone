@@ -54,19 +54,19 @@ def insert_catagoriy(request):
 def insert_sub_catagoriy(request):
     if request.method == "POST":
         sub_category_name = request.POST.get("sub_category_name")
-        category_id = request.POST.get("category")
-        
-        try:
-            category = Category.objects.get(pk=category_id)
-            existing_subcategory = SubCategory.objects.get(subcategory_name=sub_category_name, category=category)
-            
-            # Subcategory with the given name and category already exists, add category to it
-            existing_subcategory.category.add(category)
-        except SubCategory.DoesNotExist:
-            # Subcategory doesn't exist, create a new one
-            new_subcategory = SubCategory(subcategory_name=sub_category_name)
-            new_subcategory.save()
-            new_subcategory.category.add(category)
+        category_ids = request.POST.getlist("category")  # Note the use of getlist for multiple selected categories
+
+        for category_id in category_ids:
+            try:
+                category = Category.objects.get(pk=category_id)
+                # Check if the subcategory with the same name and category already exists
+                existing_subcategory = SubCategory.objects.get(subcategory_name=sub_category_name, category=category)
+                messages.warning(request, f"Subcategory '{sub_category_name}' already exists for the category '{category}'.")
+            except SubCategory.DoesNotExist:
+                # Subcategory doesn't exist, create a new one
+                new_subcategory = SubCategory(subcategory_name=sub_category_name)
+                new_subcategory.save()
+                new_subcategory.category.add(category)
 
         return redirect("category:sub_add_category")
     

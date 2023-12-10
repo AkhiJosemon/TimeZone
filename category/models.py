@@ -46,6 +46,7 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
+    id = models.AutoField(primary_key=True)
     subcategory_name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')

@@ -123,17 +123,17 @@ def add_product(request):
 
     if request.method == 'POST':
         required_fields = ['brand', 'product_name', 'category', 'sub_category', 'description', 'price', 'images[]']
-
-        if any(request.POST.get(field) == '' or request.POST.get(field) is None for field in required_fields):
+    
+        if any(request.POST.get(field, '').strip() == '' for field in required_fields):
             messages.error(request, 'All fields must be filled.')
             return redirect('category:add_product')
-
+    
         # Check if price is a positive integer
         price = request.POST.get('price')
         if not price.isdigit():
             messages.error(request, 'Price must be a valid number.')
             return redirect('category:add_product')
-
+    
         # Convert the price to an integer
         try:
             price = int(price)

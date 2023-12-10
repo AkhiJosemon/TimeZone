@@ -52,18 +52,31 @@ def insert_catagoriy(request):
 
 
 def insert_sub_catagoriy(request):
-    if request.method =="POST":
-        sub_catagory_name= request.POST.get("sub_catagory_name")
+    if request.method == "POST":
+        sub_category_name = request.POST.get("sub_category_name")
         category_id = request.POST.get("category")
-        print(category_id)
-        category=Category.objects.get(pk=category_id)
-        print(category)
+        
+        try:
+            category = Category.objects.get(pk=category_id)
+            existing_subcategory = SubCategory.objects.get(subcategory_name=sub_category_name, category=category)
+            
+            # Subcategory with the given name and category already exists, add category to it
+            existing_subcategory.category.add(category)
+        except SubCategory.DoesNotExist:
+            # Subcategory doesn't exist, create a new one
+            new_subcategory = SubCategory(subcategory_name=sub_category_name)
+            new_subcategory.save()
+            new_subcategory.category.add(category)
+
+        return redirect("category:sub_add_category")
     
-       
-        dn= SubCategory(subcategory_name=sub_catagory_name,category=category)
-        dn.save()
-        print('123')
-        return redirect("category:sub_add_catogory")
+    # Handle GET requests
+    categories = Category.objects.all()
+
+    context = {
+        'categories': categories,
+    }
+    return redirect("category:sub_add_catogory")
    
 def delete_category(request, slug):
     if request.method == 'POST':
@@ -118,31 +131,18 @@ def add_product(request):
 
     categories = Category.objects.all()
     sub_categories = SubCategory.objects.all()
-    brands=Brand.objects.all()
-    variant=Variant.objects.all()
-    
-    print(variant)
-             
+    brands = Brand.objects.all()
+    variant = Variant.objects.all()
+
     if request.method == 'POST':
-        brand_id = request.POST.get('brand')
-        product_name = request.POST.get('product_name')
-        category_id = request.POST.get('category')
-        sub_category_id=request.POST.get('sub_category')
-        description = request.POST.get('description')
-        price = request.POST.get('price')        
-        product_id = request.POST.get('product_id')
-        images = request.FILES.getlist('images[]')
-        brand_id = request.POST.get('brand')
-        brand = Brand.objects.get(id=brand_id) 
-        category = Category.objects.get(pk=category_id)
-        sub_category=SubCategory.objects.get(pk=sub_category_id)
-        cropped_image_data = request.POST.get('cropped_image')
-        
-        if  not product_name or not category_id or not sub_category_id or not description or not price or not images:
+        required_fields = ['brand', 'product_name', 'category', 'sub_category', 'description', 'price', 'images[]']
+
+        if any(request.POST.get(field) == '' or request.POST.get(field) is None for field in required_fields):
             messages.error(request, 'All fields must be filled.')
             return redirect('category:add_product')
 
         # Check if price is a positive integer
+        price = request.POST.get('price')
         if not price.isdigit():
             messages.error(request, 'Price must be a valid number.')
             return redirect('category:add_product')
@@ -156,30 +156,39 @@ def add_product(request):
             messages.error(request, 'Price must be a positive integer.')
             return redirect('category:add_product')
 
+        brand_id = request.POST.get('brand')
+        product_name = request.POST.get('product_name')
+        category_id = request.POST.get('category')
+        sub_category_id = request.POST.get('sub_category')
+        description = request.POST.get('description')
+        product_id = request.POST.get('product_id')
+        images = request.FILES.getlist('images[]')
+        brand = Brand.objects.get(id=brand_id)
+        category = Category.objects.get(pk=category_id)
+        sub_category = SubCategory.objects.get(pk=sub_category_id)
+        cropped_image_data = request.POST.get('cropped_image')
 
-            
-        product = Product(brand=brand,product_name=product_name, description=description,category=category,subcategory=sub_category, price=price, rprice=price)
-        product.image=images[0]#cropped_image_data#images[0]
+        product = Product(brand=brand, product_name=product_name, description=description, category=category,
+                          subcategory=sub_category, price=price, rprice=price)
+        product.image = images[0]  # cropped_image_data#images[0]
         product.save()
-        
+
         for i in range(len(images)):
             prd_image = ProductImage(product=product, image=images[i])
             prd_image.save()
 
         return redirect('category:product_list')
     else:
-
-        form=AddProductForm()
+        form = AddProductForm()
 
     context = {
-           'form': form,
-           'categories': categories,
-           'brands':brands,
-           'variants': variant,
-           'sub_categories':sub_categories
-         }      
-        
-   
+        'form': form,
+        'categories': categories,
+        'brands': brands,
+        'variants': variant,
+        'sub_categories': sub_categories
+    }
+
         
 
     return render(request,'admin/add_product.html',context)

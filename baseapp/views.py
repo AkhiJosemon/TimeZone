@@ -16,6 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from order.models import *
 import random
 from django.contrib import auth
+from django.db import IntegrityError
 
 @never_cache
 def index(request):
@@ -57,52 +58,66 @@ def handlelogin(request):
 
 @never_cache
 def signup(request):
-    if request.user.is_authenticated:
-        return redirect('baseapp:index')
-    
-    if request.method == 'POST':
-        first_name = request.POST.get("firstname")
-        last_name = request.POST.get("lastname")
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        pass1 = request.POST.get("password")
-        pass2 = request.POST.get("password1")
-        referral_code = request.POST.get("referral_code")
+    try:
+        if request.user.is_authenticated:
+            return redirect('baseapp:index')
 
-        # Validate referral code
-        referred_by = None
-        if referral_code:
-            try:
-                referred_by = Account.objects.get(referral_code=referral_code)
-            except Account.DoesNotExist:
-                messages.error(request, "Invalid referral code")
+        if request.method == 'POST':
+            first_name = request.POST.get("firstname")
+            last_name = request.POST.get("lastname")
+            username = request.POST.get("username")
+            email = request.POST.get("email")
+            pass1 = request.POST.get("password")
+            pass2 = request.POST.get("password1")
+            referral_code = request.POST.get("referral_code")
+
+            # Validate referral code
+            referred_by = None
+            if referral_code:
+                try:
+                    referred_by = Account.objects.get(referral_code=referral_code)
+                except Account.DoesNotExist:
+                    messages.error(request, "Invalid referral code")
+                    return redirect('baseapp:signup')
+
+            if Account.objects.filter(email=email).exists():
+                messages.error(request, "An account with this email already exists.")
                 return redirect('baseapp:signup')
+            
+            if pass1 != pass2:
+                messages.error(request, "Mismatch in password")
+                return redirect('baseapp:signup')
+            
+            # Create the user
+            user = Account.objects.create_user(email=email, password=pass1, username=username, first_name=first_name, last_name=last_name)
+            
+            # Add referral bonus to wallets
+            if referred_by:
+                referred_by_wallet, created = Wallet.objects.get_or_create(user=referred_by)
+                referred_by_wallet.wallet_amount += 100
+                referred_by_wallet.save()
 
-        if Account.objects.filter(email=email).exists():
-            messages.error(request, "Existing Email Address")
-            return redirect('baseapp:signup')
-        
-        if pass1 != pass2:
-            messages.error(request, "Mismatch in password")
-            return redirect('baseapp:signup')
-        
-        # Create the user
-        user = Account.objects.create_user(email=email, password=pass1, username=username, first_name=first_name, last_name=last_name)
-        
-        # Add referral bonus to wallets
-        if referred_by:
-            referred_by_wallet, created = Wallet.objects.get_or_create(user=referred_by)
-            referred_by_wallet.wallet_amount += 100
-            referred_by_wallet.save()
+                user_wallet, created = Wallet.objects.get_or_create(user=user)
+                user_wallet.wallet_amount += 100
+                user_wallet.save()
 
-            user_wallet, created = Wallet.objects.get_or_create(user=user)
-            user_wallet.wallet_amount += 100
-            user_wallet.save()
+            request.session['email'] = email
+            return redirect('baseapp:sp')
 
-        request.session['email'] = email
-        return redirect('baseapp:sp')
+    except IntegrityError:
+        # Handle IntegrityError (e.g., duplicate email)
+        messages.error(request, "An account with this email already exists.")
+        return redirect('baseapp:signup')
 
-    return render(request, "user/signup.html")
+    except Account.DoesNotExist:
+        # Handle Account.DoesNotExist (invalid referral code)
+        messages.error(request, "Invalid referral code")
+        return redirect('baseapp:signup')
+
+    except Exception as e:
+        # Handle other exceptions
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('baseapp:signup')
 
 @never_cache
 def sent_otp(request):

@@ -10,8 +10,8 @@ class AddProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = [ 'product_name','brand', 'category'
-                  , 'description', 'price', 'image']
+        fields = [ 'product_name','brand', 'category',
+                  'sub_category', 'description', 'price', 'image']
 
 
     def clean(self):

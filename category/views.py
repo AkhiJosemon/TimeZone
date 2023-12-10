@@ -116,20 +116,34 @@ def sub_edit_catagory(request, category_name):
 @login_required(login_url='baseapp:admin_pannel')
 def add_product(request):
 
+    
     categories = Category.objects.all()
     sub_categories = SubCategory.objects.all()
-    brands = Brand.objects.all()
-    variant = Variant.objects.all()
-
+    brands=Brand.objects.all()
+    variant=Variant.objects.all()
+    
+    print(variant)
+             
     if request.method == 'POST':
-        required_fields = ['brand', 'product_name', 'category', 'sub_category', 'description', 'price', 'images[]']
-
-        if any(request.POST.get(field) == '' or request.POST.get(field) is None for field in required_fields):
+        brand_id = request.POST.get('brand')
+        product_name = request.POST.get('product_name')
+        category_id = request.POST.get('category')
+        sub_category_id=request.POST.get('sub_category')
+        description = request.POST.get('description')
+        price = request.POST.get('price')        
+        product_id = request.POST.get('product_id')
+        images = request.FILES.getlist('images[]')
+        brand_id = request.POST.get('brand')
+        brand = Brand.objects.get(id=brand_id) 
+        category = Category.objects.get(pk=category_id)
+        sub_category=SubCategory.objects.get(pk=sub_category_id)
+        cropped_image_data = request.POST.get('cropped_image')
+        
+        if  not product_name or not category_id or not sub_category_id or not description or not price or not images:
             messages.error(request, 'All fields must be filled.')
             return redirect('category:add_product')
 
         # Check if price is a positive integer
-        price = request.POST.get('price')
         if not price.isdigit():
             messages.error(request, 'Price must be a valid number.')
             return redirect('category:add_product')
@@ -143,44 +157,31 @@ def add_product(request):
             messages.error(request, 'Price must be a positive integer.')
             return redirect('category:add_product')
 
-        brand_id = request.POST.get('brand')
-        product_name = request.POST.get('product_name')
-        category_id = request.POST.get('category')
-        sub_category_id = request.POST.get('sub_category')
-        description = request.POST.get('description')
-        product_id = request.POST.get('product_id')
-        images = request.FILES.getlist('images[]')
-        brand = Brand.objects.get(id=brand_id)
-        category = Category.objects.get(pk=category_id)
 
-        # Check if sub_category_id is empty
-        if not sub_category_id:
-            messages.error(request, 'Subcategory must be selected.')
-            return redirect('category:add_product')
-
-        sub_category = SubCategory.objects.get(pk=sub_category_id)
-        cropped_image_data = request.POST.get('cropped_image')
-
-        product = Product(brand=brand, product_name=product_name, description=description, category=category,
-                          subcategory=sub_category, price=price, rprice=price)
-        product.image = images[0]  # cropped_image_data#images[0]
+            
+        product = Product(brand=brand,product_name=product_name, description=description,category=category,subcategory=sub_category, price=price, rprice=price)
+        product.image=images[0]#cropped_image_data#images[0]
         product.save()
-
+        
         for i in range(len(images)):
             prd_image = ProductImage(product=product, image=images[i])
             prd_image.save()
 
         return redirect('category:product_list')
     else:
-        form = AddProductForm()
+
+        form=AddProductForm()
 
     context = {
-        'form': form,
-        'categories': categories,
-        'brands': brands,
-        'variants': variant,
-        'sub_categories': sub_categories
-    }
+           'form': form,
+           'categories': categories,
+           'brands':brands,
+           'variants': variant,
+           'sub_categories':sub_categories
+         }      
+        
+   
+        
 
     return render(request,'admin/add_product.html',context)
 
@@ -218,7 +219,7 @@ def edit_product(request, product_id):
         product.price = request.POST.get('price')
         product.brand = Brand.objects.get(pk=request.POST.get('brand'))
         product.stocks = request.POST.get('stock')
-
+    
         # Handle image updates (if needed)
         new_images = request.FILES.getlist('images[]')
         if new_images:

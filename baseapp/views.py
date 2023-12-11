@@ -470,7 +470,7 @@ def set_default_address(request, address_id):
 
     return redirect('baseapp:manageaddress')
 
-
+@never_cache
 def wallet(request):
     wallet_instance = None
 
